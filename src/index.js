@@ -28,30 +28,31 @@ const reducer = (state = initialState, action) => {
   // } else if (action.type === "DECREMENT") {
   //   return {...state, count: state.count - 1}
   // }
-
   switch(action.type) {
-    case "INCREMENT":
-      return {...state, count: state.count + 1}
-    case "DECREMENT":
-      return {...state, count: state.count - 1}
+    case "ADD":
+      return {...state, count: state.count+= action.payload}
+
+    case "MINUS":
+    return {...state.count, count: state.count-= action.payload}
+
     default:
       return state
-  }
+    }
 
-  return state
 }
 
 
 
 
+
 // subscribe gets called each time we send a message to the store after the reducer is called
-const store = createStore(reducer)
+const store = createStore(reducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 
 
 
-store.subscribe(() => {
-  console.log('the new state is', store.getState());
-})
+// store.subscribe(() => {
+//   console.log('the new state is', store.getState());
+// })
 
 
 
@@ -77,6 +78,7 @@ class App extends Component {
 class Header extends Component {
   componentDidMount() {
     store.subscribe(() => this.setState({}))
+    //store.subscribe(() => this.forceUpdate())
   }
 
   renderDescription = () => {
@@ -99,16 +101,17 @@ class Header extends Component {
 class Counter extends Component {
 
   componentDidMount() {
-    store.subscribe(() => this.setState({}))
+    //store.subscribe(() => this.setState({}))
+    store.subscribe(() => this.forceUpdate())
   }
 
-  increment = () => {
-    store.dispatch({type: "INCREMENT"})
-    // this.setState(prevState => ({ count: prevState.count + 1 }));
+  increment = (verb, num) => {
+    store.dispatch({type: verb, payload: num})
+    //this.setState(prevState => ({ count: prevState.count + 1 }));
   };
 
-  decrement = () => {
-    store.dispatch({type: "DECREMENT"})
+  decrement = (verb, num) => {
+    store.dispatch({type: verb, payload: num})
     // this.setState(prevState => ({ count: prevState.count - 1 }));
   };
 
@@ -118,10 +121,10 @@ class Counter extends Component {
     return (
       <div className="Counter">
         <h1>{store.getState().count}</h1>
-        <button onClick={this.decrement}> - </button>
-        <button onClick={this.increment}> + </button>
-        <button onClick={this.increment}> + 5 </button>
-        <button onClick={this.increment}> + 10 </button>
+        <button onClick={() => this.decrement("MINUS", 1)}> - </button>
+        <button onClick={() => this.increment("ADD", 1)}> + </button>
+        <button onClick={() => this.increment("ADD", 5)}> + 5 </button>
+        <button onClick={() => this.increment("ADD", 10)}> + 10 </button>
       </div>
     );
   }
